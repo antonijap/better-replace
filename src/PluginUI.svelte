@@ -1,17 +1,12 @@
 <script>
-
-	//import Global CSS from the svelte boilerplate
-	//contains Figma color vars, spacing vars, utility classes and more
 	import { GlobalCSS } from 'figma-plugin-ds-svelte';
+	import { Input, Type  } from 'figma-plugin-ds-svelte';
 
-	//import some Svelte Figma UI components
-	import { Button, Input, Label, SelectMenu, Disclosure, DisclosureItem, Switch } from 'figma-plugin-ds-svelte';
-
-	$: query = ""
+	$: searchtText = ""
 	$: newText = ""
 	$: warning = false
-	$: switchValue = false
 
+	// Recieves a message from plugin code
 	onmessage = (event) => {
 		if (event.data.pluginMessage === "select-frame") {
 			warning = true
@@ -20,45 +15,62 @@
 		}
 	}
 
+	// Sends a message from plugin code
 	function replaceText() {
 		parent.postMessage({ pluginMessage: { 
 			'type': 'replace-text', 
-			'search': query, 
+			'searchtText': searchtText, 
 			'newText': newText, 
 		} }, '*');
+		searchtText = ""
+		newText = ""
 	}
-
-	function cancel() {
-		parent.postMessage({ pluginMessage: { 'type': 'cancel' } }, '*')
-	}
-
 </script>
+
+<style>
+.wrapper {
+	padding: var(--size-xxsmall);
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-gap: var(--size-xxsmall);
+	width: 100%;
+	height: 100%;
+	align-items: center;
+	text-align: center;
+}
+button {
+	display: block;
+	text-align: center;
+	border-radius: var(--border-radius-large);
+	color: var(--figma-color-text-onbrand);
+	flex-shrink: 0;
+	font-family: var(--font-stack);
+	font-size: var(--font-size-xsmall);
+	font-weight: var(--font-weight-medium);
+	letter-spacing: var(--font-letter-spacing-neg-small);
+	line-height: var(--font-line-height);
+	height: var(--size-medium);
+	padding: 0 var(--size-xsmall) 0 var(--size-xsmall);
+	text-decoration: none;
+	outline: none;
+	border: 2px solid transparent;
+	user-select: none;
+	background-color: var(--figma-color-bg-brand);
+}
+</style>
 
 {#if warning}
 	<div class="wrapper">
-		<p>Select frame first</p>
+		<Type>Select a frame first</Type>
 	</div>
 {:else}
 	<div class="wrapper size-xsmall">
-		<Input placeholder="Search for..." bind:value={query}/>
+		<Input placeholder="Search for..." bind:value={searchtText}/>
 		<Input placeholder="Replace with..." bind:value={newText}/>
-		<Button on:click={replaceText} class={"cta"}>Replace</Button>
+		<button on:click={replaceText}>Replace</button>
 	</div>
 {/if}
 
-
-<style>
-	.wrapper {
-		padding: var(--size-xxsmall);
-		display: grid;
-		grid-template-columns: 1fr;
-		grid-gap: var(--size-xxsmall);
-	}
-	.cta {
-		display: grid;
-		text-align: center;
-	}
-</style>
 
 
 
